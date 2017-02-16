@@ -38,11 +38,11 @@ server <- function(input, output) {
                         return()
                 msg<-isolate({
                         dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos;CharSet=utf8')
-                        # Need a check if the username exists at all (and there wasn't a typo)
+                        # TODO Need a check if the username exists at all (and there wasn't a typo)
                         last24 <- sqlQuery(dbhandle, 
                                            paste0('SELECT created FROM Comments WHERE depth=0
                            AND author=\'', name, '\'
-                           AND created >= DateAdd(hh, -24, GETDATE())
+                           AND created >= DateAdd(hh, -24, GETUTCDATE())
                            ORDER BY ID DESC'))
                         posts_count <- nrow(last24)
                         current_post_bandwidth <- ifelse(posts_count>0,

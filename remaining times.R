@@ -3,7 +3,7 @@ dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=go
 last24 <- sqlQuery(dbhandle, 
                    'SELECT created FROM Comments WHERE depth=0
                 AND author=\'avtor8904\'
-                AND created >= DateAdd(hh, -24, GETDATE())
+                AND created >= DateAdd(hh, -24, GETUTCDATE())
                   ORDER BY ID DESC')
 posts_count <- nrow(last24)
 current_post_bandwidth <- ifelse(posts_count>0,
