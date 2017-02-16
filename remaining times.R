@@ -2,7 +2,7 @@ library(RODBC)
 dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos;CharSet=utf8')
 last24 <- sqlQuery(dbhandle, 
                    'SELECT created FROM Comments WHERE depth=0
-                AND author=\'georg\'
+                AND author=\'avtor8904\'
                 AND created >= DateAdd(hh, -24, GETDATE())
                   ORDER BY ID DESC')
 posts_count <- nrow(last24)
@@ -10,9 +10,9 @@ current_post_bandwidth <- ifelse(posts_count>0,
                                  {
                                          curtime <- as.character(as.POSIXlt(Sys.time(), tz="GMT"))
                                          sum(
-                                                 sapply(last24, 
+                                                 sapply(last24$created, 
                                                         function(x) 
-                                                        {10000 * (24 - difftime(curtime, x)) / 24}
+                                                        {10000 * (24 - difftime(curtime, x, units="hours")) / 24}
                                                  )
                                          )
                                  }, 0
