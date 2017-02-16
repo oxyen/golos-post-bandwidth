@@ -38,6 +38,7 @@ server <- function(input, output) {
                         return()
                 msg<-isolate({
                         dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos;CharSet=utf8')
+                        # Need a check if the username exists at all (and there wasn't a typo)
                         last24 <- sqlQuery(dbhandle, 
                                            paste0('SELECT created FROM Comments WHERE depth=0
                            AND author=\'', name, '\'
@@ -48,9 +49,9 @@ server <- function(input, output) {
                                                          {
                                                                  curtime <- as.character(as.POSIXlt(Sys.time(), tz="GMT"))
                                                                  sum(
-                                                                         sapply(last24, 
+                                                                         sapply(last24$created, 
                                                                                 function(x) 
-                                                                                {10000 * (24 - difftime(curtime, x)) / 24}
+                                                                                {10000 * (24 - difftime(curtime, x, units="hours")) / 24}
                                                                          )
                                                                  )
                                                          }, 0
