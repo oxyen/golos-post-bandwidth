@@ -8,6 +8,14 @@ p.w.c <- sqlQuery(dbhandle, 'SELECT Created, url, total_vote_weight, category, n
 p.w.c$cpervote <- p.w.c$children/p.w.c$net_votes
 p.w.c$cpervote %>% summary
 sorted <- p.w.c[order(-p.w.c$cpervote), ]
+# Top 10 discussed not liked
+sorted$url[1:10]
+
+# Top 10 liked not discussed
+sorted <- p.w.c[order(p.w.c$cpervote, -p.w.c$net_votes), ]
+# Remove statistics
+sorted <- sorted[sorted$category != 'ru--statistika',]
+sorted <- sorted[sorted$category != 'ru--reijting',]
 sorted$url[1:10]
 
 odbcClose(dbhandle)
