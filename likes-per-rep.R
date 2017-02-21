@@ -1,4 +1,5 @@
 library(RODBC)
+library(ggplot2)
 
 dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos;CharSet=utf8')
 repu<-function(x) {round((log10(x)-9)*9+25,digits=1)}
