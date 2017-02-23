@@ -1,6 +1,6 @@
 library(RODBC)
 library(ggplot2)
-
+library(lubridate)
 dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos;CharSet=utf8')
 repu<-function(x) {round((log10(x)-9)*9+25,digits=1)}
 
@@ -8,12 +8,13 @@ repu<-function(x) {round((log10(x)-9)*9+25,digits=1)}
 #a <- sqlQuery(dbhandle, 'SELECT cast(replace(c.vesting_shares,\' GESTS\',\'\') AS decimal) as shares, c.Created, c.net_votes, c.children, c.author_reputation, c.total_payout_value, c.total_pending_payout_value, (select count(*) from txCustomsFollows as f where f.what=\'["blog"]\' and f.timestamp < c.Created AND c.author=f.following) as foll FROM Comments as c WHERE c.depth=0 AND c.Created BETWEEN \'2017-2-18\' AND \'2017-2-19\' AND c.net_votes > 0 ORDER BY c.ID DESC')
 whales <- sqlQuery(dbhandle, 'SELECT Top 100 name FROM Accounts order by cast(replace(vesting_shares,\' GESTS\',\'\') AS decimal) DESC') 
 whales <- unlist(whales)
-posts.src <- sqlQuery(dbhandle, 'SELECT Created, url, depth, permlink, total_payout_value, total_pending_payout_value, author FROM Comments WHERE depth=0')
+posts.src <- sqlQuery(dbhandle, 'SELECT Created, net_votes, children, author_reputation, url, depth, permlink, total_payout_value, total_pending_payout_value, author FROM Comments WHERE depth=0')
 posts<-posts.src
 posts$date <-date(posts$Created)
-posts <- posts[posts$date > '2017-1-15',]
-ggplot(posts, aes(date))+ geom_bar()
+posts <- posts[posts$date > '2017-1-15' & posts$date < max(posts$date),]
 posts$earned<-posts$total_payout_value + posts$total_pending_payout_value
+
+
 posts$whaled <- sapply(posts$author, function(x) x %in% whales)
 share.of.whales <- tapply(posts$whaled, posts$date, sum)/tapply(posts$whaled, posts$date, length)
 q<-data.frame(date=date(names(share.of.whales)), shares=share.of.whales)
