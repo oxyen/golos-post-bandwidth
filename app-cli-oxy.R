@@ -15,7 +15,7 @@ in30min <- sqlQuery(dbhandle,
                            AND author=\'', name, '\'
                            AND created >= DateAdd(mi, -30, GETUTCDATE())'))[[1]]
 last.bandw <- sqlQuery(dbhandle, 
-                       paste0('SELECT Top 1 post_bandwidth FROM Accounts
+                       paste0('SELECT post_bandwidth FROM Accounts
                               WHERE name=\'', name, '\''))[[1]]
 
 orig.time <- Sys.time()
