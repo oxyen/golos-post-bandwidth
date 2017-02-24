@@ -8,3 +8,6 @@ for(i in 1:nrow(names))
 
 for(i in 1:nrow(names))
 { cat(paste0('@', names[i,1], ', '))}
+
+checked='narin'
+sqlQuery(dbhandle, paste0('SELECT url, reward_weight from COmments where reward_weight < 10000 AND author=\'', checked, '\' ORDER BY Created DESC'))
