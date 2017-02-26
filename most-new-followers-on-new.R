@@ -4,8 +4,8 @@ dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=go
 start <- "2017-02-17"
 end <- "2017-02-24"
 z<-sqlQuery(dbhandle, paste0(
- 'SELECT top 20 following, count(*) from txCustomsFollows WHERE what=\'["blog"]\' AND timestamp BETWEEN \'',
- start, '\' AND \'', end, ' AND following NOT IN (SELECT TOP 100 following FROM txCustomsFollows WHERE what=\'["blog"]\' AND timestamp < \'',
+ 'SELECT top 20 following, count(*) from txCustomsFollows WHERE what=\'[\"blog\"]\' AND timestamp BETWEEN \'',
+ start, '\' AND \'', end, '\' AND following NOT IN (SELECT TOP 100 following FROM txCustomsFollows WHERE what=\'[\"blog\"]\' AND timestamp < \'',
  start, '\' group by following order by count(*) desc) group by following order by count(*) desc'))
 print(z)
 odbcClose(dbhandle)
