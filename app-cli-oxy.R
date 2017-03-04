@@ -2,10 +2,7 @@ library(RODBC)
 name='oxygendependant'
 dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos')
 # TODO Need a check if the username exists at all (and there wasn't a typo)
-last.created <- sqlQuery(dbhandle, 
-                         paste0('SELECT Top 1 created FROM Comments WHERE depth=0
-                                AND author=\'', name, '\'
-                                ORDER BY Created DESC'))[[1]]
+if(exists("last.created"))rm(last.created)
 last.created <- sqlQuery(dbhandle, 
                          paste0('SELECT Top 1 created FROM Comments WHERE depth=0
                                 AND author=\'', name, '\'
