@@ -14,13 +14,20 @@ posts.src <- sqlQuery(dbhandle, 'SELECT Created, net_votes, children, author_rep
 posts<-posts.src
 # recent posts table by the line above if you want to change date range below
 posts$date <-date(posts$Created)
-posts$bm <- unlist(sapply(posts$author,function(x)length(grep("^bm-",x)))
+posts$bm <- unlist(sapply(posts$author,function(x)length(grep("^bm-",x))))
 # Less than max to drop incomplete days
 posts <- posts[posts$date > '2017-1-15' & posts$date < max(posts$date),]
 posts$earned<-posts$total_payout_value + posts$total_pending_payout_value
 
 #number of posts from BM accounts per day
-plot(tapply(posts$bm,posts$date, length))
+plot(unique(posts$date),tapply(posts$bm,posts$date, length),
+     main="number of posts from BM accounts per day",
+     xlab="date",
+     ylab="Number of posts")
+
+#number of non-bm posts
+nbm<-posts[posts$bm==0,]
+plot(tapply(nbm$date,nbm$date, length))
 
 
 posts$whaled <- sapply(posts$author, function(x) x %in% whales)
