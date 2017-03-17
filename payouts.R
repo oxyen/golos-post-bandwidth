@@ -1,6 +1,8 @@
 library(RODBC)
 library(ggplot2)
 library(lubridate)
+library(data.table)
+library(dplyr)
 dbhandle <- odbcDriverConnect('driver={SQL Server};server=sql.golos.cloud;UID=golos;PWD=golos;CharSet=utf8')
 repu<-function(x) {round((log10(x)-9)*9+25,digits=1)}
 
@@ -10,18 +12,25 @@ whales <- sqlQuery(dbhandle, 'SELECT Top 100 name FROM Accounts order by cast(re
 whales <- unlist(whales)
 posts.src <- sqlQuery(dbhandle, 'SELECT Created, net_votes, children, author_reputation, url, depth, permlink, total_payout_value, total_pending_payout_value, author FROM Comments WHERE depth=0')
 posts<-posts.src
+# recent posts table by the line above if you want to change date range below
 posts$date <-date(posts$Created)
+posts$bm <- unlist(sapply(posts$author,function(x)length(grep("^bm-",x)))
+# Less than max to drop incomplete days
 posts <- posts[posts$date > '2017-1-15' & posts$date < max(posts$date),]
 posts$earned<-posts$total_payout_value + posts$total_pending_payout_value
+
+#number of posts from BM accounts per day
+plot(tapply(posts$bm,posts$date, length))
 
 
 posts$whaled <- sapply(posts$author, function(x) x %in% whales)
 share.of.whales <- tapply(posts$whaled, posts$date, sum)/tapply(posts$whaled, posts$date, length)
-q<-data.frame(date=date(names(share.of.whales)), shares=share.of.whales)
+q<-data.frame(date=date(names(share.of.whales)), shares=round(100*share.of.whales))
 medians <- tapply(posts$earned,posts$date, median)
-plot(q)
-plot(q$date,medians)
-
+plot(q,main="Share of Golos earnings by Top 100 Golos Power holders",ylab = "Share, %")
+# PS q below looks irrelevant to whales, just a date list source?
+#plot(q$date,medians)
+plot(unique(posts$date),medians, xlab="Date", ylab = "median earnings per post, GBG")
 
 # Earned in GBG depends on currency rate
 
